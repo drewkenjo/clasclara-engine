@@ -22,7 +22,7 @@ public class DcTimeLineEngine extends ClasServiceEngine {
      * Constructor.
      */
     public DcTimeLineEngine() {
-        super("DcTimeLine", "gurjyan", "1.0", "test");
+        super("DcTimeLine", "ziegler-gurjyan", "1.0", "test");
     }
 
     @Override
@@ -44,7 +44,7 @@ public class DcTimeLineEngine extends ClasServiceEngine {
             addTsObservable("TimeResidual-3", trackingMon.getTimeResidual()[2]);
 
             publishTsObservables();
-            System.out.println(new Date() + ": reporting for ........... ");
+            System.out.println(new Date() + ": reporting DC timeline data... ");
             timerFlag.reset();
         }
         return event;

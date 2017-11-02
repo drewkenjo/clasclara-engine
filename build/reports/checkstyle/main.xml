@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="8.0">
-<file name="/Users/gurjyan/Devel/clas12-service-engine/src/org/jlab/clara/clas12/dc/monitor/DcTimeLineEngine.java">
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/org/jlab/clara/clas12/dc/monitor/DcTimeLineEngine.java">
 </file>
-<file name="/Users/gurjyan/Devel/clas12-service-engine/src/org/jlab/clara/clas12/dc/monitor/TrackingMon.java">
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/org/jlab/clara/clas12/dc/monitor/TrackingMon.java">
 <error line="6" severity="warning" message="Javadoc has empty description section." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"/>
 <error line="12" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
 <error line="16" column="5" severity="warning" message="Missing a Javadoc comment." source="com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"/>
@@ -69,12 +69,12 @@
 <error line="124" column="36" severity="warning" message="&apos;/=&apos; is not followed by whitespace." source="com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"/>
 <error line="130" column="24" severity="warning" message="&apos;{&apos; is not preceded with whitespace." source="com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"/>
 </file>
-<file name="/Users/gurjyan/Devel/clas12-service-engine/src/sys/ClasDataTypes.java">
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/ClasDataTypes.java">
 </file>
-<file name="/Users/gurjyan/Devel/clas12-service-engine/src/sys/ClasServiceConstants.java">
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/ClasServiceConstants.java">
 </file>
-<file name="/Users/gurjyan/Devel/clas12-service-engine/src/sys/ClasServiceEngine.java">
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/ClasServiceEngine.java">
 </file>
-<file name="/Users/gurjyan/Devel/clas12-service-engine/src/sys/util/TimerFlag.java">
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/util/TimerFlag.java">
 </file>
 </checkstyle>

@@ -343,7 +343,7 @@ public abstract class ClasServiceEngine implements Engine {
                     + this.getClass().getName());
             ConstantsManager manager = new ConstantsManager();
             manager.init(tables);
-            constManagerMap.putIfAbsent(this.getClass().getName(), manager);
+            constManagerMap.put(this.getClass().getName(), manager);
         }
     }
 
