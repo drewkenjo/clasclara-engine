@@ -33,6 +33,15 @@ mime-types:
   - binary/data-hipo
 
 configuration:
+  global:
+    magnet:
+      torus: 10.75
+      solenoid: 0.5
+    ccdb:
+      run: 10
+      variation: custom
+    kalman: true
+
   io-services:
     reader:
       block_size: 10000
@@ -47,10 +56,4 @@ configuration:
         - outer
     HeaderFilter:
       max_hits: 29
-    magnet:
-      torus: 10.75
-      solenoid: 0.5
-    ccdb:
-      run: 10
-      variation: custom
 ```
