@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * CLAS12 plugin specific service engine class.
@@ -42,6 +43,7 @@ public abstract class ClasServiceEngine implements Engine {
             constManagerMap = new ConcurrentHashMap<>();
     private volatile SchemaFactory engineDictionary;
 
+    private AtomicReference<EngineStatus> status;
     private String name;
     private String author;
     private String version;
@@ -83,6 +85,7 @@ public abstract class ClasServiceEngine implements Engine {
      * @param description the description of the engine.
      */
     public ClasServiceEngine(String name, String author, String version, String description) {
+        status = new AtomicReference<>(EngineStatus.INFO);
         this.name = name;
         this.author = author;
         this.version = version;
@@ -111,6 +114,13 @@ public abstract class ClasServiceEngine implements Engine {
         return base.get(key);
     }
 
+    /**
+     * Call this method in case you got an error condition during the execution of
+     * the engine.
+     */
+    public void setErrorFlag(){
+        status.set(EngineStatus.ERROR);
+    }
 
     /**
      * Sets the topic of the data-publication on the Clara ring.
@@ -257,6 +267,7 @@ public abstract class ClasServiceEngine implements Engine {
                     engineData.setData(dataType, ((EvioDataEvent) result).getEventBuffer());
                 }
             }
+            engineData.setStatus(status.get());
 
         } catch (Exception e) {
             String msg = String.format("Error reading input event%n%n%s",
@@ -343,7 +354,7 @@ public abstract class ClasServiceEngine implements Engine {
                     + this.getClass().getName());
             ConstantsManager manager = new ConstantsManager();
             manager.init(tables);
-            constManagerMap.put(this.getClass().getName(), manager);
+            constManagerMap.putIfAbsent(this.getClass().getName(), manager);
         }
     }
 
