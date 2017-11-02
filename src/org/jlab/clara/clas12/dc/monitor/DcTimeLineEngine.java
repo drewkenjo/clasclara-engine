@@ -29,6 +29,7 @@ public class DcTimeLineEngine extends ClasServiceEngine {
     public Object processDataEvent(DataEvent event) {
 
         if (timerFlag.isUp()) {
+            trackingMon.fetch_Trks(event);
             addTsObservable("snapshot_time", ClaraUtil.getCurrentTime());
             addTsObservable("NbHBTracks", trackingMon.getNbHBTracks());
             addTsObservable("NbTBTracks", trackingMon.getNbTBTracks());
