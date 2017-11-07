@@ -2,6 +2,7 @@ package org.jlab.clara.clas12.dc.monitor;
 
 import org.jlab.clara.base.ClaraUtil;
 import org.jlab.io.base.DataEvent;
+import sys.ClasEngineException;
 import sys.ClasServiceEngine;
 import sys.util.TimerFlag;
 
@@ -53,6 +54,21 @@ public class DcTimeLineEngine extends ClasServiceEngine {
 
     @Override
     public boolean userInit(String json) {
+        System.out.println(prettyPrintJson(json));
+        System.out.println("DDD===============================DDD");
+
+        try {
+            System.out.println(getConfigParameter(json, "ccdb", "run"));
+            System.out.println(getConfigParameter(json, "vvar"));
+        } catch (ClasEngineException e) {
+            e.printStackTrace();
+        }
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("DDD===============================DDD");
         trackingMon = new TrackingMon();
         timerFlag = new TimerFlag(5);
         return true;

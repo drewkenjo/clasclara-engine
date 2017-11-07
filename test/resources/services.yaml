@@ -1,0 +1,40 @@
+io-services:
+  reader:
+    class: org.jlab.clas.std.services.convertors.HipoToHipoReader
+    name: HipoToHipoReader
+  writer:
+    class: org.jlab.clas.std.services.convertors.HipoToHipoWriter
+    name: HipoToHipoWriter
+services:
+  data-processing:
+    chain:
+     - class: org.jlab.service.dc.DCHBEngine
+       name: DCHB
+     - class: org.jlab.service.dc.DCTBEngine
+       name: DCTB
+  monitoring:
+    chain:
+     - class: org.jlab.clara.clas12.dc.monitor.DcTimeLineEngine
+       name: DCMON
+
+mime-types:
+  - binary/data-hipo
+
+configuration:
+  global:
+    magnet:
+      torus: 10.75
+      solenoid: 0.5
+    ccdb:
+      run: 10
+      variation: custom
+    kalman: true
+
+  io-services:
+    writer:
+      compression: 2
+
+  services:
+    DCMON:
+      log: true
+      vvar: 1371

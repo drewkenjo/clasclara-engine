@@ -74,6 +74,7 @@
 <li>/Users/gurjyan/Devel/clasclara-engine/build/classes/main/org/jlab/clara/clas12/dc/monitor/DcTimeLineEngine.class</li>
 <li>/Users/gurjyan/Devel/clasclara-engine/build/classes/main/org/jlab/clara/clas12/dc/monitor/TrackingMon.class</li>
 <li>/Users/gurjyan/Devel/clasclara-engine/build/classes/main/sys/ClasDataTypes.class</li>
+<li>/Users/gurjyan/Devel/clasclara-engine/build/classes/main/sys/ClasEngineException.class</li>
 <li>/Users/gurjyan/Devel/clasclara-engine/build/classes/main/sys/ClasServiceConstants.class</li>
 <li>/Users/gurjyan/Devel/clasclara-engine/build/classes/main/sys/ClasServiceEngine.class</li>
 <li>/Users/gurjyan/Devel/clasclara-engine/build/classes/main/sys/util/TimerFlag$1.class</li>
@@ -85,8 +86,8 @@
 <br/>
 </p>
 <h2>Metrics</h2>
-<p>320 lines of code analyzed,
-	in 8 classes, 
+<p>364 lines of code analyzed,
+	in 9 classes, 
 	in 3 packages.</p>
 <table width="500" cellpadding="5" cellspacing="2">
 <tr class="tableheader">
@@ -101,18 +102,18 @@
 </tr>
 <tr class="tablerow1">
 <td>Medium Priority Warnings</td>
-<td align="right">1</td>
-<td align="right">3.12</td>
+<td align="right"/>
+<td align="right">0.00</td>
 </tr>
 <tr class="$totalClass">
 <td>
 <b>Total Warnings</b>
 </td>
 <td align="right">
-<b>1</b>
+<b>0</b>
 </td>
 <td align="right">
-<b>3.12</b>
+<b>0.00</b>
 </td>
 </tr>
 </table>
@@ -126,9 +127,6 @@
 <h2>Contents</h2>
 <ul>
 <li>
-<a href="#Warnings_MT_CORRECTNESS">Multithreaded correctness Warnings</a>
-</li>
-<li>
 <a href="#Details">Details</a>
 </li>
 </ul>
@@ -140,54 +138,17 @@
 </tr>
 <tr class="tablerow0">
 <td>
-<a href="#Warnings_MT_CORRECTNESS">Multithreaded correctness Warnings</a>
-</td>
-<td align="right">1</td>
-</tr>
-<tr class="tablerow1">
-<td>
 <b>Total</b>
 </td>
 <td align="right">
-<b>1</b>
+<b>0</b>
 </td>
 </tr>
 </table>
 <h1>Warnings</h1>
 <p>Click on a warning row to see full context information.</p>
-<h2>
-<a name="Warnings_MT_CORRECTNESS">Multithreaded correctness Warnings</a>
-</h2>
-<table class="warningtable" width="100%" cellspacing="0">
-<tr class="tableheader">
-<th align="left">Code</th>
-<th align="left">Warning</th>
-</tr>
-<tr class="tablerow1" onclick="toggleRow('N65612');">
-<td>
-<span class="priority-2">AT</span>
-</td>
-<td>Sequence of calls to java.util.concurrent.ConcurrentHashMap may not be atomic in sys.ClasServiceEngine.requireConstants(List)</td>
-</tr>
-<tr class="detailrow1">
-<td/>
-<td>
-<p id="N65612" style="display: none;">
-<a href="#AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION">Bug type AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION (click for details)</a>
-<br/>In class sys.ClasServiceEngine<br/>In method sys.ClasServiceEngine.requireConstants(List)<br/>Type java.util.concurrent.ConcurrentHashMap<br/>Called method java.util.concurrent.ConcurrentHashMap.put(Object, Object)<br/>At ClasServiceEngine.java:[line 346]</p>
-</td>
-</tr>
-</table>
 <h1>
 <a name="Details">Details</a>
 </h1>
-<h2>
-<a name="AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION">AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION: Sequence of calls to concurrent abstraction may not be atomic</a>
-</h2>
-          
-        <p>This code contains a sequence of calls to a concurrent  abstraction
-            (such as a concurrent hash map).
-            These calls will not be executed atomically.
-          
-      </body>
+</body>
 </html>

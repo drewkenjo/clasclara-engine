@@ -18,6 +18,7 @@ import org.jlab.io.base.DataEvent;
 import org.jlab.io.evio.EvioDataEvent;
 import org.jlab.io.evio.EvioFactory;
 import org.jlab.io.hipo.HipoDataEvent;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.InetAddress;
@@ -44,6 +45,7 @@ public abstract class ClasServiceEngine implements Engine {
     private volatile SchemaFactory engineDictionary;
 
     private AtomicReference<EngineStatus> status;
+    private AtomicReference<String> statusDescription;
     private String name;
     private String author;
     private String version;
@@ -86,6 +88,7 @@ public abstract class ClasServiceEngine implements Engine {
      */
     public ClasServiceEngine(String name, String author, String version, String description) {
         status = new AtomicReference<>(EngineStatus.INFO);
+        statusDescription = new AtomicReference<>(ClaraConstants.INFO);
         this.name = name;
         this.author = author;
         this.version = version;
@@ -106,20 +109,58 @@ public abstract class ClasServiceEngine implements Engine {
      * Method helps to extract configuration parameters defined in the Clara YAML file.
      *
      * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
      * @param key        the key of the config parameter.
-     * @return value of the config parameter.
+     * @return object of the parameter
+     * @throws ClasEngineException clas engine exception
      */
-    public Object getConfigParameter(String jsonString, String key) {
-        JSONObject base = new JSONObject(jsonString);
-        return base.get(key);
+    protected Object getConfigParameter(String jsonString,
+                                        String group,
+                                        String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            if (group == null) {
+                js = base.get(key);
+            } else {
+                js = base.getJSONObject(group).get(key);
+            }
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+        return js;
     }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param key        the key of the config parameter.
+     * @return object of the parameter
+     * @throws ClasEngineException clas engine exception
+     */
+    protected Object getConfigParameter(String jsonString,
+                                        String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.get(key);
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+        return js;
+    }
+
 
     /**
      * Call this method in case you got an error condition during the execution of
      * the engine.
+     *
+     * @param description description of the error state
      */
-    public void setErrorFlag(){
+    public void setStateError(String description) {
         status.set(EngineStatus.ERROR);
+        statusDescription.set(description);
     }
 
     /**
@@ -134,9 +175,9 @@ public abstract class ClasServiceEngine implements Engine {
     /**
      * Sets the type of the data going to be published on the Clara ring.
      *
-     * @param dataType Clara engine data type:  {@link EngineDataType}
+     * @param dataType Clara engine data type:  {@link ClasDataTypes}
      */
-    public synchronized void setRingOutDataType(EngineDataType dataType) {
+    public synchronized void setRingOutDataType(ClasDataTypes dataType) {
         ringOutDataType = dataType;
     }
 
@@ -235,16 +276,17 @@ public abstract class ClasServiceEngine implements Engine {
 
                 Object result = processDataEvent(hipoDataEvent);
                 // Check to see if service engine needs to publish data to the ring
-                if (isRingReady.get()) {
+                if (isRingReady.get() && result != null) {
                     if (result instanceof HipoDataEvent) {
                         engineData.setData(dataType, ((HipoDataEvent) result).getHipoEvent());
+                        engineData.setExecutionState(ringTopic);
                     } else {
                         engineData.setData(ringOutDataType, result);
                         engineData.setExecutionState(ringTopic);
                     }
                 } else {
                     // No ring publishing. Send data across the chain
-                    engineData.setData(dataType, ((HipoDataEvent) result).getHipoEvent());
+                    engineData.setData(dataType, hipoDataEvent.getHipoEvent());
                 }
 
             } else if (dataType.equals(ClasDataTypes.EVIO)) {
@@ -255,16 +297,17 @@ public abstract class ClasServiceEngine implements Engine {
                         new EvioDataEvent(buffer, endianness, EvioFactory.getDictionary());
                 Object result = processDataEvent(evioDataEvent);
                 // Check to see if service engine needs to publish data to the ring
-                if (isRingReady.get()) {
+                if (isRingReady.get() && result != null) {
                     if (result instanceof EvioDataEvent) {
                         engineData.setData(dataType, ((EvioDataEvent) result).getEventBuffer());
+                        engineData.setExecutionState(ringTopic);
                     } else {
                         engineData.setData(ringOutDataType, result);
                         engineData.setExecutionState(ringTopic);
                     }
                 } else {
                     // No ring publishing. Send data across the chain
-                    engineData.setData(dataType, ((EvioDataEvent) result).getEventBuffer());
+                    engineData.setData(dataType, evioDataEvent.getEventBuffer());
                 }
             }
             engineData.setStatus(status.get());
@@ -358,4 +401,14 @@ public abstract class ClasServiceEngine implements Engine {
         }
     }
 
+    /**
+     * Returns well formatted JSon string.
+     *
+     * @param jsonString input string
+     * @return formatted string
+     */
+    protected String prettyPrintJson(String jsonString) {
+        JSONObject json = new JSONObject(jsonString);
+        return json.toString(4);
+    }
 }
