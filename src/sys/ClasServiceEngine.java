@@ -175,9 +175,9 @@ public abstract class ClasServiceEngine implements Engine {
     /**
      * Sets the type of the data going to be published on the Clara ring.
      *
-     * @param dataType Clara engine data type:  {@link ClasDataTypes}
+     * @param dataType Clara engine data type:  {@link EngineDataType}
      */
-    public synchronized void setRingOutDataType(ClasDataTypes dataType) {
+    public synchronized void setRingOutDataType(EngineDataType dataType) {
         ringOutDataType = dataType;
     }
 
@@ -269,7 +269,7 @@ public abstract class ClasServiceEngine implements Engine {
         isRingReady.set(false);
         resetTsObservables();
         try {
-            if (dataType.equals(ClasDataTypes.HIPO)) {
+            if (dataType.equals(ClasDataTypes.HIPO.mimeType())) {
                 HipoEvent hipoEvent = (HipoEvent) engineData.getData();
                 HipoDataEvent hipoDataEvent = new HipoDataEvent(hipoEvent);
                 hipoDataEvent.initDictionary(engineDictionary);
@@ -289,7 +289,7 @@ public abstract class ClasServiceEngine implements Engine {
                     engineData.setData(dataType, hipoDataEvent.getHipoEvent());
                 }
 
-            } else if (dataType.equals(ClasDataTypes.EVIO)) {
+            } else if (dataType.equals(ClasDataTypes.EVIO.mimeType())) {
                 ByteBuffer bb = (ByteBuffer) engineData.getData();
                 byte[] buffer = bb.array();
                 ByteOrder endianness = bb.order();

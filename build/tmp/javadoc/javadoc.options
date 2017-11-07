@@ -7,4 +7,5 @@
 -quiet 
 -windowtitle 'clasclara-engine 1.0.0-SNAPSHOT API'
 '/Users/gurjyan/Devel/clasclara-engine/src/org/jlab/clara/clas12/dc/monitor/DcTimeLineEngine.java'
+'/Users/gurjyan/Devel/clasclara-engine/src/org/jlab/clara/clas12/dc/monitor/DcTLRingClient.java'
 '/Users/gurjyan/Devel/clasclara-engine/src/org/jlab/clara/clas12/dc/monitor/TrackingMon.java'

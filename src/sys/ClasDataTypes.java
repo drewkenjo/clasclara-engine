@@ -1,22 +1,26 @@
 package sys;
 
+import org.jlab.clara.base.error.ClaraException;
 import org.jlab.clara.engine.ClaraSerializer;
 import org.jlab.clara.engine.EngineDataType;
+import org.jlab.hipo.data.HipoEvent;
+
+import java.nio.ByteBuffer;
 
 /**
  * Clas12 specific data types.
  * @author gurjyan
  */
-public class ClasDataTypes extends EngineDataType {
+public final class ClasDataTypes extends EngineDataType {
 
     /**
-     * EVIO data format definition.
+     * EVIO data type definition.
      */
-    static final String EVIO = "binary/data-evio";
+    public static final EngineDataType EVIO = buildEvio();
     /**
-     * HIPO data format definition.
+     * HIPO data type definition.
      */
-    static final String HIPO = "binary/data-hipo";
+    public static final EngineDataType HIPO = buildHipo();
 
     /**
      * Creates a new user data type.
@@ -30,4 +34,27 @@ public class ClasDataTypes extends EngineDataType {
     public ClasDataTypes(String mimeType, ClaraSerializer serializer) {
         super(mimeType, serializer);
     }
+
+    private static EngineDataType buildHipo() {
+        return new EngineDataType("binary/data-hipo", new HipoSerializer());
+    }
+
+    private static EngineDataType buildEvio() {
+        return new EngineDataType("binary/data-evio", EngineDataType.BYTES.serializer());
+    }
+
+    private static class HipoSerializer implements ClaraSerializer {
+
+        @Override
+        public ByteBuffer write(Object data) throws ClaraException {
+            HipoEvent event = (HipoEvent) data;
+            return ByteBuffer.wrap(event.getDataBuffer());
+        }
+
+        @Override
+        public Object read(ByteBuffer buffer) throws ClaraException {
+            return new HipoEvent(buffer.array());
+        }
+    }
+
 }
