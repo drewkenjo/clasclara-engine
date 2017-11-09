@@ -21,6 +21,8 @@ import org.jlab.io.hipo.HipoDataEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -31,6 +33,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.json.JSONObject.quote;
 
 /**
  * CLAS12 plugin specific service engine class.
@@ -109,26 +113,50 @@ public abstract class ClasServiceEngine implements Engine {
      * Method helps to extract configuration parameters defined in the Clara YAML file.
      *
      * @param jsonString JSon configuration object (passed to the userInit method).
-     * @param group      config parameter group.
      * @param key        the key of the config parameter.
-     * @return object of the parameter
+     * @return parameter: String value
      * @throws ClasEngineException clas engine exception
      */
-    protected Object getConfigParameter(String jsonString,
-                                        String group,
-                                        String key) throws ClasEngineException {
+    protected String getStringConfigParameter(String jsonString,
+                                              String key) throws ClasEngineException {
         Object js;
         try {
             JSONObject base = new JSONObject(jsonString);
-            if (group == null) {
-                js = base.get(key);
+            js = base.get(key);
+            if (js instanceof String) {
+                return (String) js;
             } else {
-                js = base.getJSONObject(group).get(key);
+                throw new ClasEngineException("JSONObject[" + quote(key) + "] not a string.");
             }
         } catch (JSONException e) {
             throw new ClasEngineException(e.getMessage());
         }
-        return js;
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: String value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected String getStringConfigParameter(String jsonString,
+                                              String group,
+                                              String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            if (js instanceof String) {
+                return (String) js;
+            } else {
+                throw new ClasEngineException("JSONObject[" + quote(key) + "] not a string.");
+            }
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
     }
 
     /**
@@ -136,21 +164,237 @@ public abstract class ClasServiceEngine implements Engine {
      *
      * @param jsonString JSon configuration object (passed to the userInit method).
      * @param key        the key of the config parameter.
-     * @return object of the parameter
+     * @return parameter: int value
      * @throws ClasEngineException clas engine exception
      */
-    protected Object getConfigParameter(String jsonString,
+    protected int getIntConfigParameter(String jsonString,
                                         String key) throws ClasEngineException {
         Object js;
         try {
             JSONObject base = new JSONObject(jsonString);
             js = base.get(key);
+            return js instanceof Number ? ((Number) js).intValue() : Integer.parseInt((String) js);
         } catch (JSONException e) {
             throw new ClasEngineException(e.getMessage());
         }
-        return js;
     }
 
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: int value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected int getIntConfigParameter(String jsonString,
+                                        String group,
+                                        String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            return js instanceof Number ? ((Number) js).intValue() : Integer.parseInt((String) js);
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param key        the key of the config parameter.
+     * @return parameter: double value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected double getDoubleConfigParameter(String jsonString,
+                                              String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.get(key);
+            if (js instanceof Number) {
+                return ((Number) js).doubleValue();
+            } else {
+                return Double.parseDouble((String) js);
+            }
+
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: double value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected double getDoubleConfigParameter(String jsonString,
+                                              String group,
+                                              String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            if (js instanceof Number) {
+                return ((Number) js).doubleValue();
+            } else {
+                return Double.parseDouble((String) js);
+            }
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param key        the key of the config parameter.
+     * @return parameter: boolean value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected boolean getBooleanConfigParameter(String jsonString,
+                                                String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.get(key);
+            if (!js.equals(Boolean.FALSE) && (!(js instanceof String) || !((String) js).equalsIgnoreCase("false"))) {
+                if (!js.equals(Boolean.TRUE) && (!(js instanceof String) || !((String) js).equalsIgnoreCase("true"))) {
+                    throw new ClasEngineException("JSONObject[" + quote(key) + "] is not a Boolean.");
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: boolean value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected boolean getBooleanConfigParameter(String jsonString,
+                                                String group,
+                                                String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            if (!js.equals(Boolean.FALSE) && (!(js instanceof String) || !((String) js).equalsIgnoreCase("false"))) {
+                if (!js.equals(Boolean.TRUE) && (!(js instanceof String) || !((String) js).equalsIgnoreCase("true"))) {
+                    throw new ClasEngineException("JSONObject[" + quote(key) + "] is not a Boolean.");
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param key        the key of the config parameter.
+     * @return parameter: BigInteger value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected BigInteger getBigIntegerConfigParameter(String jsonString,
+                                                      String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.get(key);
+            return new BigInteger(js.toString());
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: BigInteger value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected BigInteger getBigIntegerConfigParameter(String jsonString,
+                                                      String group,
+                                                      String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            return new BigInteger(js.toString());
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param key        the key of the config parameter.
+     * @return parameter: BigDecimal value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected BigDecimal getBigDecimalConfigParameter(String jsonString,
+                                                      String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.get(key);
+            return new BigDecimal(js.toString());
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: BigDecimal value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected BigDecimal getBigDecimalConfigParameter(String jsonString,
+                                                      String group,
+                                                      String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            return new BigDecimal(js.toString());
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
 
     /**
      * Call this method in case you got an error condition during the execution of

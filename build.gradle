@@ -34,6 +34,9 @@ sourceSets {
 }
 
 repositories {
+    flatDir {
+        dirs 'lib'
+    }
     maven {
         url 'http://clasweb.jlab.org/clas12maven/'
     }
@@ -56,6 +59,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'org.mockito:mockito-core:1.10.19'
+    compile name: 'clas12detector-dc-1.0-SNAPSHOT'
 }
 
 javadoc {

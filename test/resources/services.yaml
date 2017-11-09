@@ -8,10 +8,10 @@ io-services:
 services:
   data-processing:
     chain:
-     - class: org.jlab.service.dc.DCHBEngine
+     - class: org.jlab.clara.clas12.dc.reconstruction.VDCHBEngine
        name: DCHB
-     - class: org.jlab.service.dc.DCTBEngine
-       name: DCTB
+#     - class: org.jlab.service.dc.DCTBEngine
+#       name: DCTB
   monitoring:
     chain:
      - class: org.jlab.clara.clas12.dc.monitor.DcTimeLineEngine
@@ -23,12 +23,13 @@ mime-types:
 configuration:
   global:
     magnet:
-      torus: 10.75
-      solenoid: 0.5
+      torus: -1
+      solenoid: 1
     ccdb:
-      run: 10
+      run: 101
       variation: custom
-    kalman: true
+    runtype: mc
+    runmode: calibration
 
   io-services:
     writer:
@@ -38,3 +39,4 @@ configuration:
     DCMON:
       log: true
       vvar: 1371
+      kalman: true

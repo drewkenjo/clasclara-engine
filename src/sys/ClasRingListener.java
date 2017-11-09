@@ -11,6 +11,7 @@ import org.jlab.coda.xmsg.net.xMsgRegAddress;
 
 /**
  * Clara data ring listener class.
+ *
  * @author gurjyan
  */
 public abstract class ClasRingListener extends xMsg {
@@ -26,11 +27,11 @@ public abstract class ClasRingListener extends xMsg {
     /**
      * Constructor.
      *
-     * @param name of this listener
+     * @param name     of this listener
      * @param ringHost host of the CDR
-     * @param domain of the topic on the CDR
-     * @param subject of the topic on the CDR
-     * @param type of the topic on the CDR
+     * @param domain   of the topic on the CDR
+     * @param subject  of the topic on the CDR
+     * @param type     of the topic on the CDR
      * @throws xMsgException in case connection fails
      */
     public ClasRingListener(String name, String ringHost,
@@ -45,8 +46,8 @@ public abstract class ClasRingListener extends xMsg {
     }
 
     private void listen(String domain,
-                       String subject,
-                       String type) throws xMsgException {
+                        String subject,
+                        String type) throws xMsgException {
         xMsgTopic topic = xMsgTopic.build(domain, subject, type);
         // subscribe
         subscribe(topic, new ClasRingListener.MyCallBack());

@@ -91,20 +91,20 @@ public class DcTimeLineEngine extends ClasServiceEngine {
 
     @Override
     public boolean userInit(String json) {
-        System.out.println(prettyPrintJson(json));
-        System.out.println("DDD ===============================");
+//        System.out.println(prettyPrintJson(json));
+//        System.out.println("DDD ===============================");
 
-        try {
-            System.out.println(getConfigParameter(json, "ccdb", "run"));
-            System.out.println(getConfigParameter(json, "vvar"));
-        } catch (ClasEngineException e) {
-            e.printStackTrace();
-        }
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            System.out.println(getIntConfigParameter(json, "ccdb", "run"));
+//            System.out.println(getIntConfigParameter(json, "vvar"));
+//        } catch (ClasEngineException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         trackingMon = new TrackingMon();
         timerFlag = new TimerFlag(5);
         return true;
