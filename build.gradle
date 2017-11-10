@@ -46,6 +46,7 @@ repositories {
 }
 
 dependencies {
+//    compile 'org.jlab.clas12.detector:clas12detector-dc:1.0-SNAPSHOT'
     compile 'org.jlab.coda:jclara:4.3-SNAPSHOT'
     compile 'org.jlab.coat:coat-libs:4.0-SNAPSHOT'
     compile 'org.jlab.coda:xmsg:2.3'
@@ -100,7 +101,7 @@ uploadArchives {
 
 def deploySpec = copySpec {
     into ('plugins/clas12/lib/services') {
-        from configurations.runtime
+//        from configurations.runtime
         from jar.archivePath
     }
 
