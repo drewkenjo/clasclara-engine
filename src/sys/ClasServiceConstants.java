@@ -10,7 +10,7 @@ final class ClasServiceConstants {
     /**
      * Default topic.
      */
-    static final String DEFAULT_TOPIC = "monitor";
+    static final String EMPTY_STRING = "";
     /**
      * Default InfluxDB host.
      */

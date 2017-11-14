@@ -1,3 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-exec ./scripts/exec-class.sh org.jlab.clara.clas12.dc.monitor.DcTLRingClient "$@"
+
+# set default classpath
+if [ -z "${CLASSPATH}" ]; then
+    CLASSPATH="${CLARA_HOME}/plugins/clas12/lib/services/*"
+    export CLASSPATH
+fi
+
+java_wrapper=${CLARA_HOME}/lib/clara/run-java
+
+exec "${java_wrapper}" org.jlab.clara.clas12.dc.monitor.DCRingListener "$@"

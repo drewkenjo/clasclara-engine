@@ -10,7 +10,7 @@ plugins {
 }
 group = 'org.jlab.clara.clas12'
 archivesBaseName = 'clas12clara'
-version = '1.0.0-SNAPSHOT'
+version = '1.0-SNAPSHOT'
 
 defaultTasks 'build'
 
@@ -47,7 +47,7 @@ repositories {
 
 dependencies {
 //    compile 'org.jlab.clas12.detector:clas12detector-dc:1.0-SNAPSHOT'
-    compile 'org.jlab.coda:jclara:4.3-SNAPSHOT'
+    compileOnly 'org.jlab.coda:jclara:4.3-SNAPSHOT'
     compile 'org.jlab.coat:coat-libs:4.0-SNAPSHOT'
     compile 'org.jlab.coda:xmsg:2.3'
     compile 'org.yaml:snakeyaml:1.18'
@@ -101,7 +101,6 @@ uploadArchives {
 
 def deploySpec = copySpec {
     into ('plugins/clas12/lib/services') {
-//        from configurations.runtime
         from jar.archivePath
     }
 

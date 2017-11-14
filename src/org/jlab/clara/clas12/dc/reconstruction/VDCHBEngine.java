@@ -31,6 +31,12 @@ import sys.ClasServiceEngine;
 
 import java.util.List;
 
+/**
+ * DCHB engine.
+ *
+ * @author ziegler
+ * @author gurjyan (put on the new interface, work in progress...)
+ */
 public class VDCHBEngine extends ClasServiceEngine {
 
     private volatile int run;
@@ -38,6 +44,9 @@ public class VDCHBEngine extends ClasServiceEngine {
     private volatile double torus;
     private volatile boolean isCalib;
 
+    /**
+     * Constructor.
+     */
     public VDCHBEngine() {
         super("DCHB", "ziegler", "3.0", "dc-hit-based-reconstruction");
     }
@@ -49,7 +58,9 @@ public class VDCHBEngine extends ClasServiceEngine {
             run = getIntConfigParameter(json, "ccdb", "run");
             solenoid = getDoubleConfigParameter(json, "magnet", "solenoid");
             torus = getDoubleConfigParameter(json, "magnet", "torus");
-            if ((getStringConfigParameter(json, "runmode")).equals("calibration")) isCalib = true;
+            if ((getStringConfigParameter(json, "runmode")).equals("calibration")) {
+                isCalib = true;
+            }
 
             System.out.println("DDD =======================");
             System.out.println("run      = " + run);
@@ -111,7 +122,7 @@ public class VDCHBEngine extends ClasServiceEngine {
         //II) process the hits
         //1) exit if hit list is empty
         if (hits.size() == 0) {
-            return true;
+            return event;
         }
 
         fhits = rbc.createRawHitList(hits);
@@ -124,7 +135,7 @@ public class VDCHBEngine extends ClasServiceEngine {
 
         if (clusters.size() == 0) {
             rbc.fillAllHBBanks(event, rbc, fhits, null, null, null, null);
-            return true;
+            return event;
         }
 
         rbc.updateListsListWithClusterInfo(fhits, clusters);
@@ -135,7 +146,7 @@ public class VDCHBEngine extends ClasServiceEngine {
 
         if (segments.size() == 0) { // need 6 segments to make a trajectory
             rbc.fillAllHBBanks(event, rbc, fhits, clusters, null, null, null);
-            return true;
+            return event;
         }
         //RoadFinder
         //
@@ -151,15 +162,15 @@ public class VDCHBEngine extends ClasServiceEngine {
 
         if (crosses.size() == 0) {
             rbc.fillAllHBBanks(event, rbc, fhits, clusters, segments, null, null);
-            return true;
+            return event;
         }
 
         CrossListFinder crossLister = new CrossListFinder();
 
-        List<List<Cross>> CrossesInSector = crossLister.get_CrossesInSectors(crosses);
+        List<List<Cross>> crossesInSector = crossLister.get_CrossesInSectors(crosses);
         for (int s = 0; s < 6; s++) {
-            if (CrossesInSector.get(s).size() > Constants.MAXNBCROSSES) {
-                return true;
+            if (crossesInSector.get(s).size() > Constants.MAXNBCROSSES) {
+                return event;
             }
         }
 
@@ -168,7 +179,7 @@ public class VDCHBEngine extends ClasServiceEngine {
         if (crosslist.size() == 0) {
 
             rbc.fillAllHBBanks(event, rbc, fhits, clusters, segments, crosses, null);
-            return true;
+            return event;
         }
 
         //6) find the list of  track candidates
@@ -179,16 +190,18 @@ public class VDCHBEngine extends ClasServiceEngine {
 
             // no cand found, stop here and save the hits, the clusters, the segments, the crosses
             rbc.fillAllHBBanks(event, rbc, fhits, clusters, segments, crosses, null);
-            return true;
+            return event;
         }
         // track found
         int trkId = 1;
         for (Track trk : trkcands) {
             for (Cross c : trk) {
-                for (FittedHit h1 : c.get_Segment1())
+                for (FittedHit h1 : c.get_Segment1()) {
                     h1.set_AssociatedHBTrackID(trk.get_Id());
-                for (FittedHit h2 : c.get_Segment2())
+                }
+                for (FittedHit h2 : c.get_Segment2()) {
                     h2.set_AssociatedHBTrackID(trk.get_Id());
+                }
             }
 
         }
@@ -200,10 +213,12 @@ public class VDCHBEngine extends ClasServiceEngine {
             // reset the id
             trk.set_Id(trkId);
             for (Cross c : trk) {
-                for (FittedHit h1 : c.get_Segment1())
+                for (FittedHit h1 : c.get_Segment1()) {
                     h1.set_AssociatedHBTrackID(trk.get_Id());
-                for (FittedHit h2 : c.get_Segment2())
+                }
+                for (FittedHit h2 : c.get_Segment2()) {
                     h2.set_AssociatedHBTrackID(trk.get_Id());
+                }
             }
             trkId++;
         }
@@ -218,19 +233,18 @@ public class VDCHBEngine extends ClasServiceEngine {
 
         // Load the constants
         //-------------------
-        boolean T2DCalc;
+        boolean t2DCalc;
 
         if (run > 99) {
             Constants.setT0(true);
             Constants.setUseMiniStagger(true);
         }
-        T2DCalc = true;
+        t2DCalc = true;
         Constants.setUseMiniStagger(true);
 
-        System.out.println("   SETTING RUN-DEPENDENT CONSTANTS, T0 = " +
-                Constants.getT0() +
-                " use ministagger " +
-                Constants.getUseMiniStagger());
+        System.out.println("   SETTING RUN-DEPENDENT CONSTANTS, T0 = "
+                + Constants.getT0() + " use ministagger "
+                + Constants.getUseMiniStagger());
         CalibrationConstantsLoader.Load(run, "default");
 
         TableLoader.Fill();
@@ -241,12 +255,12 @@ public class VDCHBEngine extends ClasServiceEngine {
         //-----------------
         String newConfig = "SOLENOID" + solenoid + "TORUS" + torus + "RUN" + run;
         // Load the Constants
-        double TorScale = torus;
+        double torScale = torus;
         //TorScale = -0.5;
 
-        Constants.Load(T2DCalc, isCalib, TorScale); // set the T2D Grid for Cosmic data only so far....
+        Constants.Load(t2DCalc, isCalib, torScale); // set the T2D Grid for Cosmic data only so far....
         // Load the Fields
-        DCSwimmer.setMagneticFieldsScales(solenoid, TorScale); // something changed in the configuration ...
+        DCSwimmer.setMagneticFieldsScales(solenoid, torScale); // something changed in the configuration ...
     }
 
 

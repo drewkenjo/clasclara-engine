@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.json.JSONObject.quote;
@@ -54,9 +53,8 @@ public abstract class ClasServiceEngine implements Engine {
     private String author;
     private String version;
     private String description;
-    private String ringTopic = ClasServiceConstants.DEFAULT_TOPIC;
-    private EngineDataType ringOutDataType = EngineDataType.JSON;
-    private AtomicBoolean isRingReady = new AtomicBoolean(false);
+    private volatile String ringTopic = ClasServiceConstants.EMPTY_STRING;
+    private volatile EngineDataType ringOutDataType = EngineDataType.JSON;
 
     private JinFlux jinFlux;
     private boolean jinFxConnected;
@@ -425,13 +423,6 @@ public abstract class ClasServiceEngine implements Engine {
         ringOutDataType = dataType;
     }
 
-    /**
-     * Sets the flag indicating readiness to publish data on the ring.
-     */
-    public void ringPublish() {
-        isRingReady.set(true);
-    }
-
     private HashMap<String, Object> getThreadLocalObservablesMap() {
         HashMap<String, Object> map = tsObservables.get();
         if (map == null) {
@@ -510,8 +501,8 @@ public abstract class ClasServiceEngine implements Engine {
 
         String dataType = engineData.getMimeType();
         // Reset ring-publish flag
-        isRingReady.set(false);
         resetTsObservables();
+        ringTopic = ClasServiceConstants.EMPTY_STRING;
         try {
             if (dataType.equals(ClasDataTypes.HIPO.mimeType())) {
                 HipoEvent hipoEvent = (HipoEvent) engineData.getData();
@@ -520,7 +511,8 @@ public abstract class ClasServiceEngine implements Engine {
 
                 Object result = processDataEvent(hipoDataEvent);
                 // Check to see if service engine needs to publish data to the ring
-                if (isRingReady.get() && result != null) {
+
+                if (result != null) {
                     if (result instanceof HipoDataEvent) {
                         engineData.setData(dataType, ((HipoDataEvent) result).getHipoEvent());
                         engineData.setExecutionState(ringTopic);
@@ -541,7 +533,7 @@ public abstract class ClasServiceEngine implements Engine {
                         new EvioDataEvent(buffer, endianness, EvioFactory.getDictionary());
                 Object result = processDataEvent(evioDataEvent);
                 // Check to see if service engine needs to publish data to the ring
-                if (isRingReady.get() && result != null) {
+                if (result != null) {
                     if (result instanceof EvioDataEvent) {
                         engineData.setData(dataType, ((EvioDataEvent) result).getEventBuffer());
                         engineData.setExecutionState(ringTopic);
@@ -597,7 +589,14 @@ public abstract class ClasServiceEngine implements Engine {
         return ClaraUtil.buildDataTypes(Clas12Types.EVIO,
                 Clas12Types.HIPO,
                 EngineDataType.JSON,
-                EngineDataType.STRING);
+                EngineDataType.STRING,
+                EngineDataType.ARRAY_FLOAT,
+                EngineDataType.ARRAY_DOUBLE,
+                EngineDataType.ARRAY_SINT64,
+                EngineDataType.ARRAY_STRING,
+                EngineDataType.NATIVE_PAYLOAD,
+                EngineDataType.NATIVE_DATA
+                );
     }
 
     @Override

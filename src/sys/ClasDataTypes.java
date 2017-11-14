@@ -21,6 +21,10 @@ public final class ClasDataTypes extends EngineDataType {
      * HIPO data type definition.
      */
     public static final EngineDataType HIPO = buildHipo();
+    /**
+     * HISTO data type definition.
+     */
+    public static final EngineDataType HISTO = buildHisto();
 
     /**
      * Creates a new user data type.
@@ -43,6 +47,10 @@ public final class ClasDataTypes extends EngineDataType {
         return new EngineDataType("binary/data-evio", EngineDataType.BYTES.serializer());
     }
 
+    private static EngineDataType buildHisto() {
+        return new EngineDataType("binary/data-histo", new ClasHistoSerializer());
+    }
+
     private static class HipoSerializer implements ClaraSerializer {
 
         @Override
@@ -54,6 +62,20 @@ public final class ClasDataTypes extends EngineDataType {
         @Override
         public Object read(ByteBuffer buffer) throws ClaraException {
             return new HipoEvent(buffer.array());
+        }
+    }
+
+    private static class ClasHistoSerializer implements ClaraSerializer {
+
+        @Override
+        public ByteBuffer write(Object data) throws ClaraException {
+
+            return null;
+        }
+
+        @Override
+        public Object read(ByteBuffer buffer) throws ClaraException {
+            return null;
         }
     }
 
