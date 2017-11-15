@@ -16,6 +16,8 @@ import java.util.Set;
  */
 public abstract class CDRListener implements EngineReportHandler {
 
+    private volatile String dataType;
+    private volatile String engineName;
     /**
      * Process data off the ring.
      *
@@ -28,21 +30,26 @@ public abstract class CDRListener implements EngineReportHandler {
      *
      * @return {@link EngineDataType} object
      */
-    public abstract EngineDataType getExpectedDataType();
+    public abstract EngineDataType[] getExpectedDataType();
 
     @Override
     public void handleEvent(EngineData event) {
-        System.out.printf("%s: received %s [%s] from %s%n",
-                ClaraUtil.getCurrentTime(),
-                event.getExecutionState(),
-                event.getMimeType(),
-                event.getEngineName());
+        dataType = event.getMimeType();
+        engineName = event.getEngineName();
         processRingEvent(event.getData());
     }
 
     @Override
     public Set<EngineDataType> dataTypes() {
         return ClaraUtil.buildDataTypes(getExpectedDataType());
+    }
+
+    public String getDataType(){
+        return dataType;
+    }
+
+    public String getDataAuthor() {
+        return engineName;
     }
 }
 

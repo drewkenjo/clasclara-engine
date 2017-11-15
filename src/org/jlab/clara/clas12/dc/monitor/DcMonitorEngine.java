@@ -52,7 +52,7 @@ public class DcMonitorEngine extends ClasServiceEngine {
             addTsObservable("TimeResidual-3", trackingMon.getTimeResidual()[2]);
 
             // Report monitor data to InfluxDB
-//            System.out.println(new Date() + ": reporting DC timeline data to InfluxDB... ");
+            System.out.println(new Date() + ": reporting DC timeline data to InfluxDB... ");
             publishTsObservables();
 
             // Create and report monitor data to the Clara Data Ring

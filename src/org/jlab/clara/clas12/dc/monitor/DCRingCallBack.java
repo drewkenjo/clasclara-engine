@@ -16,15 +16,16 @@ public class DCRingCallBack extends CDRListener {
     public void processRingEvent(Object data) {
         System.out.println(ClaraUtil.getCurrentTime() + " : data off the ring...");
         Float[] d = (Float[]) data;
-        for (float f: d) {
+        for (float f : d) {
             System.out.println(f);
         }
         System.out.println("=====================");
     }
 
     @Override
-    public EngineDataType getExpectedDataType() {
-        return EngineDataType.ARRAY_FLOAT;
+    public EngineDataType[] getExpectedDataType() {
+        EngineDataType[] dataTypes = new EngineDataType[1];
+        dataTypes[0] = EngineDataType.ARRAY_FLOAT;
+        return dataTypes;
     }
-
 }

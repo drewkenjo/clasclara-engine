@@ -29,5 +29,6 @@ public final class DCRingListener {
 
         // Start listening reports on the ring
         monitor.listenEngineReports(topic, new DCRingCallBack());
+
     }
 }
