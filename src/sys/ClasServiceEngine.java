@@ -18,8 +18,11 @@ import org.jlab.io.base.DataEvent;
 import org.jlab.io.evio.EvioDataEvent;
 import org.jlab.io.evio.EvioFactory;
 import org.jlab.io.hipo.HipoDataEvent;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -28,8 +31,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.json.JSONObject.quote;
 
 /**
  * CLAS12 plugin specific service engine class.
@@ -44,13 +48,13 @@ public abstract class ClasServiceEngine implements Engine {
     private volatile SchemaFactory engineDictionary;
 
     private AtomicReference<EngineStatus> status;
+    private AtomicReference<String> statusDescription;
     private String name;
     private String author;
     private String version;
     private String description;
-    private String ringTopic = ClasServiceConstants.DEFAULT_TOPIC;
-    private EngineDataType ringOutDataType = EngineDataType.JSON;
-    private AtomicBoolean isRingReady = new AtomicBoolean(false);
+    private volatile String ringTopic = ClasServiceConstants.EMPTY_STRING;
+    private volatile EngineDataType ringOutDataType = EngineDataType.JSON;
 
     private JinFlux jinFlux;
     private boolean jinFxConnected;
@@ -86,6 +90,7 @@ public abstract class ClasServiceEngine implements Engine {
      */
     public ClasServiceEngine(String name, String author, String version, String description) {
         status = new AtomicReference<>(EngineStatus.INFO);
+        statusDescription = new AtomicReference<>(ClaraConstants.INFO);
         this.name = name;
         this.author = author;
         this.version = version;
@@ -107,19 +112,297 @@ public abstract class ClasServiceEngine implements Engine {
      *
      * @param jsonString JSon configuration object (passed to the userInit method).
      * @param key        the key of the config parameter.
-     * @return value of the config parameter.
+     * @return parameter: String value
+     * @throws ClasEngineException clas engine exception
      */
-    public Object getConfigParameter(String jsonString, String key) {
-        JSONObject base = new JSONObject(jsonString);
-        return base.get(key);
+    protected String getStringConfigParameter(String jsonString,
+                                              String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.get(key);
+            if (js instanceof String) {
+                return (String) js;
+            } else {
+                throw new ClasEngineException("JSONObject[" + quote(key) + "] not a string.");
+            }
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: String value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected String getStringConfigParameter(String jsonString,
+                                              String group,
+                                              String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            if (js instanceof String) {
+                return (String) js;
+            } else {
+                throw new ClasEngineException("JSONObject[" + quote(key) + "] not a string.");
+            }
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param key        the key of the config parameter.
+     * @return parameter: int value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected int getIntConfigParameter(String jsonString,
+                                        String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.get(key);
+            return js instanceof Number ? ((Number) js).intValue() : Integer.parseInt((String) js);
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: int value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected int getIntConfigParameter(String jsonString,
+                                        String group,
+                                        String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            return js instanceof Number ? ((Number) js).intValue() : Integer.parseInt((String) js);
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param key        the key of the config parameter.
+     * @return parameter: double value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected double getDoubleConfigParameter(String jsonString,
+                                              String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.get(key);
+            if (js instanceof Number) {
+                return ((Number) js).doubleValue();
+            } else {
+                return Double.parseDouble((String) js);
+            }
+
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: double value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected double getDoubleConfigParameter(String jsonString,
+                                              String group,
+                                              String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            if (js instanceof Number) {
+                return ((Number) js).doubleValue();
+            } else {
+                return Double.parseDouble((String) js);
+            }
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param key        the key of the config parameter.
+     * @return parameter: boolean value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected boolean getBooleanConfigParameter(String jsonString,
+                                                String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.get(key);
+            if (!js.equals(Boolean.FALSE) && (!(js instanceof String) || !((String) js).equalsIgnoreCase("false"))) {
+                if (!js.equals(Boolean.TRUE) && (!(js instanceof String) || !((String) js).equalsIgnoreCase("true"))) {
+                    throw new ClasEngineException("JSONObject[" + quote(key) + "] is not a Boolean.");
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: boolean value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected boolean getBooleanConfigParameter(String jsonString,
+                                                String group,
+                                                String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            if (!js.equals(Boolean.FALSE) && (!(js instanceof String) || !((String) js).equalsIgnoreCase("false"))) {
+                if (!js.equals(Boolean.TRUE) && (!(js instanceof String) || !((String) js).equalsIgnoreCase("true"))) {
+                    throw new ClasEngineException("JSONObject[" + quote(key) + "] is not a Boolean.");
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param key        the key of the config parameter.
+     * @return parameter: BigInteger value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected BigInteger getBigIntegerConfigParameter(String jsonString,
+                                                      String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.get(key);
+            return new BigInteger(js.toString());
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: BigInteger value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected BigInteger getBigIntegerConfigParameter(String jsonString,
+                                                      String group,
+                                                      String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            return new BigInteger(js.toString());
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param key        the key of the config parameter.
+     * @return parameter: BigDecimal value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected BigDecimal getBigDecimalConfigParameter(String jsonString,
+                                                      String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.get(key);
+            return new BigDecimal(js.toString());
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Method helps to extract configuration parameters defined in the Clara YAML file.
+     *
+     * @param jsonString JSon configuration object (passed to the userInit method).
+     * @param group      config parameter group.
+     * @param key        the key of the config parameter.
+     * @return parameter: BigDecimal value
+     * @throws ClasEngineException clas engine exception
+     */
+    protected BigDecimal getBigDecimalConfigParameter(String jsonString,
+                                                      String group,
+                                                      String key) throws ClasEngineException {
+        Object js;
+        try {
+            JSONObject base = new JSONObject(jsonString);
+            js = base.getJSONObject(group).get(key);
+            return new BigDecimal(js.toString());
+        } catch (JSONException e) {
+            throw new ClasEngineException(e.getMessage());
+        }
     }
 
     /**
      * Call this method in case you got an error condition during the execution of
      * the engine.
+     *
+     * @param description description of the error state
      */
-    public void setErrorFlag(){
+    public void setStateError(String description) {
         status.set(EngineStatus.ERROR);
+        statusDescription.set(description);
     }
 
     /**
@@ -138,13 +421,6 @@ public abstract class ClasServiceEngine implements Engine {
      */
     public synchronized void setRingOutDataType(EngineDataType dataType) {
         ringOutDataType = dataType;
-    }
-
-    /**
-     * Sets the flag indicating readiness to publish data on the ring.
-     */
-    public void ringPublish() {
-        isRingReady.set(true);
     }
 
     private HashMap<String, Object> getThreadLocalObservablesMap() {
@@ -225,29 +501,31 @@ public abstract class ClasServiceEngine implements Engine {
 
         String dataType = engineData.getMimeType();
         // Reset ring-publish flag
-        isRingReady.set(false);
         resetTsObservables();
+        ringTopic = ClasServiceConstants.EMPTY_STRING;
         try {
-            if (dataType.equals(ClasDataTypes.HIPO)) {
+            if (dataType.equals(ClasDataTypes.HIPO.mimeType())) {
                 HipoEvent hipoEvent = (HipoEvent) engineData.getData();
                 HipoDataEvent hipoDataEvent = new HipoDataEvent(hipoEvent);
                 hipoDataEvent.initDictionary(engineDictionary);
 
                 Object result = processDataEvent(hipoDataEvent);
                 // Check to see if service engine needs to publish data to the ring
-                if (isRingReady.get()) {
+
+                if (result != null) {
                     if (result instanceof HipoDataEvent) {
                         engineData.setData(dataType, ((HipoDataEvent) result).getHipoEvent());
+                        engineData.setExecutionState(ringTopic);
                     } else {
                         engineData.setData(ringOutDataType, result);
                         engineData.setExecutionState(ringTopic);
                     }
                 } else {
                     // No ring publishing. Send data across the chain
-                    engineData.setData(dataType, ((HipoDataEvent) result).getHipoEvent());
+                    engineData.setData(dataType, hipoDataEvent.getHipoEvent());
                 }
 
-            } else if (dataType.equals(ClasDataTypes.EVIO)) {
+            } else if (dataType.equals(ClasDataTypes.EVIO.mimeType())) {
                 ByteBuffer bb = (ByteBuffer) engineData.getData();
                 byte[] buffer = bb.array();
                 ByteOrder endianness = bb.order();
@@ -255,16 +533,17 @@ public abstract class ClasServiceEngine implements Engine {
                         new EvioDataEvent(buffer, endianness, EvioFactory.getDictionary());
                 Object result = processDataEvent(evioDataEvent);
                 // Check to see if service engine needs to publish data to the ring
-                if (isRingReady.get()) {
+                if (result != null) {
                     if (result instanceof EvioDataEvent) {
                         engineData.setData(dataType, ((EvioDataEvent) result).getEventBuffer());
+                        engineData.setExecutionState(ringTopic);
                     } else {
                         engineData.setData(ringOutDataType, result);
                         engineData.setExecutionState(ringTopic);
                     }
                 } else {
                     // No ring publishing. Send data across the chain
-                    engineData.setData(dataType, ((EvioDataEvent) result).getEventBuffer());
+                    engineData.setData(dataType, evioDataEvent.getEventBuffer());
                 }
             }
             engineData.setStatus(status.get());
@@ -310,7 +589,14 @@ public abstract class ClasServiceEngine implements Engine {
         return ClaraUtil.buildDataTypes(Clas12Types.EVIO,
                 Clas12Types.HIPO,
                 EngineDataType.JSON,
-                EngineDataType.STRING);
+                EngineDataType.STRING,
+                EngineDataType.ARRAY_FLOAT,
+                EngineDataType.ARRAY_DOUBLE,
+                EngineDataType.ARRAY_SINT64,
+                EngineDataType.ARRAY_STRING,
+                EngineDataType.NATIVE_PAYLOAD,
+                EngineDataType.NATIVE_DATA
+                );
     }
 
     @Override
@@ -358,4 +644,14 @@ public abstract class ClasServiceEngine implements Engine {
         }
     }
 
+    /**
+     * Returns well formatted JSon string.
+     *
+     * @param jsonString input string
+     * @return formatted string
+     */
+    protected String prettyPrintJson(String jsonString) {
+        JSONObject json = new JSONObject(jsonString);
+        return json.toString(4);
+    }
 }
